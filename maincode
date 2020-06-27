@@ -1,0 +1,19 @@
+# First feed prodigy with seed terms to show the type of words sought
+!prodigy terms.teach skills_terms en_core_web_lg --seeds "oversee, manage, supervise"
+
+
+# Now create a patterns file
+prodigy terms.to_patterns skills_terms skills-patterns.jsonl --label skill
+
+
+
+# Set up a dataset for the skills named entity recognition system
+prodigy dataset skills_ner “Train skills label”
+
+# Teach the system the types of word to recognise
+prodigy ner.teach skills_ner en_core_web_lg a.jsonl --label SKILL --patterns skills-patterns.jsonl --loader jsonl
+
+
+
+# Apply deep learning with 20% of the data used to evaluate effectiveness of the model, 6 passes over the data in batches of 8
+prodigy ner.batch-train skills_ner en_core_web_lg --output skills-model --label skill --eval-split 0.2 --n-iter 8 --batch-size 8
